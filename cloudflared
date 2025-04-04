@@ -134,13 +134,14 @@ tunnel_cloudflared() {
     fi
 
     
+    
 echo -e "\n🔐 Verificando login do Cloudflared..."
 cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
 
 if [ -z "$cred_file" ]; then
     echo "🧩 Realizando login no Cloudflare..."
     
-    # Deixa o login acontecer normalmente, mostrando o link diretamente
+   
     cloudflared tunnel login
 
     echo -e "\n⏳ Aguardando autenticação..."
