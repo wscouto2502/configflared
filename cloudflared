@@ -6,27 +6,29 @@ menu_principal() {
 
         echo "O que deseja fazer?
 
-        [00]: Configurar IP Fixo
-        [01]: Configurar Tunnel CloudFlared
-        [02]: Configuração inicial do IP
-        [03]: Listar todos os IPs da maquina
+        [00]: Listar todos os IPs da maquina
+        [01]: Configurar IP Fixo
+        [02]: voltar a configuração inicial do IP
+        [03]: Configurar Tunnel CloudFlared
+
+        
         [xx]: Sair do instalador"
 
         read -p "Digite sua opção: " opcao1
 
         case $opcao1 in
             0|00)
-                serve_local_ip_fixo
+                todos_ips
                 ;;
             1|01)
-                tunnel_cloudflared
+                serve_local_ip_fixo
                 ;;
             2|02)
                 serve_local_ip_fixo_retorno
                 ;;
             3|03)
                 #listar ip
-                todos_ips
+                tunnel_cloudflared
                 ;;    
             sair|fechar|exit|close|x|xx|XX|X)
                 clear
