@@ -90,7 +90,7 @@ $(for dns in "${dns_servers[@]}"; do echo "          - $dns"; done)
 EOF
 )
 
-    echo "$config" | sudo tee /etc/netplan/#1-installer-config.yaml > /dev/null
+    echo "$config" | sudo tee /etc/netplan/-01-installer-config.yaml > /dev/null
 
     chmod -R 755 /etc/netplan
 
@@ -114,7 +114,7 @@ tunnel_cloudflared() {
 }
 
 serve_local_ip_fixo_retorno() {
-    sudo rm -rf /etc/netplan/#1-installer-config.yaml
+    sudo rm -rf /etc/netplan/-01-installer-config.yaml
     echo "Dados das Interfaces disponiveis antes da restauração"
     echo "------------------------------------------"
     dados_interface
