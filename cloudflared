@@ -24,7 +24,7 @@ menu_principal() {
             2|02)
                 serve_local_ip_fixo_retorno
                 ;;
-            2|03)
+            3|03)
                 todos_ips
                 ;;    
             sair|fechar|exit|close|x|xx|XX|X)
@@ -131,6 +131,7 @@ serve_local_ip_fixo_retorno() {
 }
 
 todos_ips(){
+    clear
     echo -e "\nLista de ip(s) da maquina:"
     echo ""
     ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
