@@ -25,6 +25,7 @@ menu_principal() {
                 serve_local_ip_fixo_retorno
                 ;;
             3|03)
+                #listar ip
                 todos_ips
                 ;;    
             sair|fechar|exit|close|x|xx|XX|X)
