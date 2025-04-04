@@ -94,14 +94,15 @@ EOF
 
     sudo chmod -R 755 /etc/netplan/00-installer-config.yaml
 
-    echo "Aplicando configurações..."
+    echo ""
+    echo ""
+    echo ""
+    echo ""
+    echo -e "\nAplicando configurações..."
+    echo -e "\nseu novo IP: $ip_address"
+    echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
     sudo netplan apply
 
-    echo -e "\nConfiguração aplicada com sucesso!"
-    echo "IP configurado: $ip_address"
-    echo "Gateway: $gateway"
-    echo ""
-    read -p "Pressione Enter para voltar ao menu..."
 }
 
 tunnel_cloudflared() {
@@ -110,8 +111,29 @@ tunnel_cloudflared() {
 }
 
 serve_local_ip_fixo_retorno() {
-    echo "Função de configuração inicial do IP ainda não implementada."
+    if [ ! -d /etc/netplan_bkp ]; then
+        sudo cp -r /etc/netplan_bkp/* /etc/netplan/
+        sudo chmod -R 755 /etc/netplan
+        sudo rm -rf /etc/netplan_bkp
+        echo "backup restaurado"
+
+        # Caminho para o arquivo Netplan
+        arquivo_netplan="/etc/netplan/00-installer-config.yaml"
+
+        # Extrai o endereço IP (linha que começa com "- " e contém "/")
+        ip=$(grep -oP '^\s*-\s*\K[\d\.]+/\d+' "$arquivo_netplan")
+
+
+        echo -e "\nseu IP: $ip"
+        echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
+        sudo netplan apply
+
+    else
+        echo "O diretório /etc/netplan_bkp já existe. Nenhum backup foi criado."
+    fi
+
     read -p "Pressione Enter para voltar ao menu..."
+    menu_principal
 }
 
 # Iniciar o script
