@@ -179,8 +179,10 @@ tunnel_cloudflared() {
     if [ ! -f "$config_tunel_file" ]; then
         echo "\n🔀 Gerando identificador aleatório para o túnel..."
         tunel_nome="tunnel_$(openssl rand -hex 6)"
-        tunel_id=$(cloudflared tunnel create $tunel_nome 2>&1 | grep -oP '(?<=Created tunnel [^ ]+ with id )[a-f0-9\-]+')
-
+        
+        # Corrigido para não usar lookbehind
+        tunel_id=$(cloudflared tunnel create "$tunel_nome" 2>&1 | awk '/Created tunnel/ {print $NF}')
+        
         if [ -z "$tunel_id" ]; then
             echo "❌ Erro ao criar túnel."
             exit 1
@@ -192,6 +194,7 @@ tunnel_cloudflared() {
         tunel_nome=$(cut -d '=' -f 1 "$config_tunel_file")
         tunel_id=$(cut -d '=' -f 2 "$config_tunel_file")
     fi
+
 
     echo "\n🌐 Digite os domínios separados por espaço (ex: exemplo.com app.exemplo.com):"
     read dominios
