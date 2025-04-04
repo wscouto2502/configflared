@@ -140,8 +140,16 @@ cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
 
 if [ -z "$cred_file" ]; then
     echo "🧩 Realizando login no Cloudflare..."
-       
-    cloudflared tunnel login 
+
+    # Salva a saída do login em uma variável e também mostra no terminal
+    login_output=$(cloudflared tunnel login | tee /dev/tty)
+
+    # Captura o link de autenticação, se aparecer
+    link=$(echo "$login_output" | grep -oE 'https://dash.cloudflare.com/argotunnel[^[:space:]]*')
+
+    if [ -n "$link" ]; then
+        echo -e "\n🔗 Link detectado para login: $link"
+    fi
 
     echo -e "\n⏳ Aguardando autenticação..."
     read -p "✅ Após completar a autenticação, pressione ENTER para continuar..."
@@ -154,6 +162,7 @@ if [ -z "$cred_file" ]; then
         exit 1
     fi
 fi
+
 
 
 
