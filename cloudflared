@@ -90,7 +90,7 @@ $(for dns in "${dns_servers[@]}"; do echo "          - $dns"; done)
 EOF
 )
 
-    echo "$config" | sudo tee /etc/netplan/01-installer-config.yaml > /dev/null
+    echo "$config" | sudo tee /etc/netplan/#1-installer-config.yaml > /dev/null
 
     chmod -R 755 /etc/netplan
 
@@ -114,7 +114,7 @@ tunnel_cloudflared() {
 }
 
 serve_local_ip_fixo_retorno() {
-    sudo rm -rf /etc/netplan/01-installer-config.yaml
+    sudo rm -rf /etc/netplan/#1-installer-config.yaml
     echo "Dados das Interfaces disponiveis antes da restauração"
     echo "------------------------------------------"
     dados_interface
@@ -134,6 +134,33 @@ todos_ips(){
     echo ""  # quebra de linha
     read -p "Concluido! Pressione Enter para voltar ao menu..."
 }
+
+
+backup_placaderede(){
+
+    if [ ! -d /etc/netplan_bkp ]; then
+
+        # Cria o diretório de backup
+        sudo mkdir -p /etc/netplan_bkp
+
+        # Copia os arquivos de configuração para o backup
+        sudo cp -r /etc/netplan/* /etc/netplan_bkp/
+
+        # Remove todos os arquivos da pasta /etc/netplan
+        sudo rm -f /etc/netplan/*
+    fi
+}
+
+recuperar_backup_placaderede(){
+
+    if [ -d /etc/netplan_bkp ]; then
+        # Remove arquivos atuais (caso haja)
+        sudo rm -f /etc/netplan/*
+
+        # Copia os arquivos do backup de volta para o diretório original
+        sudo cp -r /etc/netplan_bkp/* /etc/netplan/
+}
+
 
 
 dados_interface(){
