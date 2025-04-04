@@ -85,7 +85,7 @@ EOF
 
     echo "$config" | sudo tee /etc/netplan/01-installer-config.yaml > /dev/null
 
-    sudo chmod -R 755 /etc/netplan/01-installer-config.yaml
+    sudo chmod 644 /etc/netplan/01-installer-config.yaml
 
     echo ""
     echo ""
