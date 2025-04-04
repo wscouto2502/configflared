@@ -87,7 +87,6 @@ EOF
 
     chmod -R 755 /etc/netplan
 
-    sudo netplan apply
     clear
     echo ""
     echo ""
@@ -98,8 +97,11 @@ EOF
     echo -e "\nLista de ip(s) da maquina:"
     echo ""
     ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
-    sudo netplan apply
-    read -p "Pressione Enter para voltar ao menu..."
+    echo ""
+    read -p "Aguarde aplicando paremetros..."
+    sudo netplan apply > /dev/null 2>&1
+    sleep 15
+    read -p "Concluido! Pressione Enter para voltar ao menu..."
 
 }
 
@@ -120,10 +122,11 @@ serve_local_ip_fixo_retorno() {
         echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
         
         chmod -R 755 /etc/netplan
-        sudo netplan apply
-
-    read -p "Pressione Enter para voltar ao menu..."
-    menu_principal
+        read -p "Aguarde aplicando paremetros..."
+        sudo netplan apply > /dev/null 2>&1
+        sleep 15
+        read -p "Concluido! Pressione Enter para voltar ao menu..."
+        menu_principal
 }
 
 # Iniciar o script
