@@ -9,9 +9,7 @@ menu_principal() {
         [00]: Listar todos os IPs da maquina
         [01]: Configurar IP Fixo
         [02]: voltar a configuração inicial do IP
-        [03]: Configurar Tunnel CloudFlared
-
-        
+        [03]: Configurar Tunnel CloudFlared   
         [xx]: Sair do instalador"
 
         read -p "Digite sua opção: " opcao1
