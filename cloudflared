@@ -92,7 +92,7 @@ EOF
     sudo rm -rf /etc/netplan/*
     echo "$config" | sudo tee /etc/netplan/00-installer-config.yaml > /dev/null
 
-    sudo chmod -R 755 /etc/netplan
+    sudo chmod -R 755 /etc/netplan/00-installer-config.yaml
 
     echo "Aplicando configurações..."
     sudo netplan apply
