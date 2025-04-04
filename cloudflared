@@ -83,9 +83,16 @@ $(for dns in "${dns_servers[@]}"; do echo "          - $dns"; done)
 EOF
 )
 
-    [ -d /etc/netplan_bkp ] || (sudo mkdir -p /etc/netplan_bkp && sudo cp -r /etc/netplan/* /etc/netplan_bkp/)
+    if [ ! -d /etc/netplan_bkp ]; then
+    sudo mkdir -p /etc/netplan_bkp
+    sudo cp -r /etc/netplan/* /etc/netplan_bkp/
+    fi
+    
+    
     sudo rm -rf /etc/netplan/*
     echo "$config" | sudo tee /etc/netplan/00-installer-config.yaml > /dev/null
+
+    sudo chmod -R 755 /etc/netplan
 
     echo "Aplicando configurações..."
     sudo netplan apply
