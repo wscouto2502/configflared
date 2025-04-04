@@ -1,191 +1,111 @@
-menu_principal(){
+#!/bin/bash
 
-while true; do
+menu_principal() {
+    while true; do
+        clear
 
-    clear
+        echo "O que deseja fazer?
 
-    echo "O que deseja fazer?
+        [00]: Configurar IP Fixo
+        [01]: Configurar Tunnel CloudFlared
+        [02]: Configuração inicial do IP
+        [xx]: Sair do instalador"
 
-    [00]: Configurar IP Fixo
-    [01]: Configurar Tunnel CloudFlared
-    [02]: Configuração inicial do IP
-    [xx]: Sair do instalador"
+        read -p "Digite sua opção: " opcao1
 
-
-    read interface
-
-    case $opcao1 in
-
-        0|00)
-            serve_local_ip_fixo
-            ;;
-
-        1|01)
-            tunnel_cloudflared
-            ;;
-        2|02)
-            serve_local_ip_fixo_retorno
-            ;;
-
-        sair|fechar|exit|close|x|xx|XX|x)
-            clear
-            echo "Obrigado por utilizar!"
-            break
-            ;;
-        *)
-
-            ;;
-    esac
-    echo ""
+        case $opcao1 in
+            0|00)
+                serve_local_ip_fixo
+                ;;
+            1|01)
+                tunnel_cloudflared
+                ;;
+            2|02)
+                serve_local_ip_fixo_retorno
+                ;;
+            sair|fechar|exit|close|x|xx|XX|X)
+                clear
+                echo "Obrigado por utilizar!"
+                break
+                ;;
+            *)
+                echo "Opção inválida. Pressione Enter para continuar..."
+                read
+                ;;
+        esac
+        echo ""
+    done
 }
-
-
 
 serve_local_ip_fixo() {
-
-clear
-
-############ criar um novo para o nome
-## Mostra o nome da aplicação
-#nome_traefik_e_portainer
-
-## Mostra mensagem para preencher informações
-#preencha_as_info
-
-## Inicia um Loop até os dados estarem certos
-while true; do
-
-    echo "Lista das placa de rede disponivel:
-    
-    "
-    ip link show | awk -F': ' '/^[0-9]+: / && !/veth[0-9a-f]+@/ && !/docker0/ && !/docker_gwbridge/ && !/lo/ {print $2}'
-
-    # Solicita ao usuário as informações necessárias
-    echo "Digite o nome da placa de rede (ex: enp0s3):"
-    read interface
-
-    echo "Digite o endereço IP com a máscara (ex: 192.168.0.10/24):"
-    read ip_address
-
-    echo "Digite o gateway, IP do roteador (ex: 192.168.0.1):"
-    read gateway
-
-    echo "Digite o(s) servidor(es) DNS separados por espaço (ex: 1.1.1.1 8.8.8.8):"
-    read -a dns_servers
-
-
     clear
+    while true; do
+        echo "Lista das placas de rede disponíveis:"
+        ip link show | awk -F': ' '/^[0-9]+: / && !/veth[0-9a-f]+@/ && !/docker0/ && !/docker_gwbridge/ && !/lo/ {print $2}'
+        echo ""
 
-    ## Informação sobre URL
-    echo -e "\e[33m nome da placa de rede:\e[97m $interface\e[0m"
-    echo ""
+        read -p "Digite o nome da placa de rede (ex: enp0s3): " interface
+        read -p "Digite o endereço IP com a máscara (ex: 192.168.0.10/24): " ip_address
+        read -p "Digite o gateway, IP do roteador (ex: 192.168.0.1): " gateway
+        echo "Digite o(s) servidor(es) DNS separados por espaço (ex: 1.1.1.1 8.8.8.8):"
+        read -a dns_servers
 
-    ## Informação sobre URL
-    echo -e "\e[33m IP da máquina:\e[97m $ip_address\e[0m"
-    echo ""
-
-    ## Informação sobre URL
-    echo -e "\e[33m Gateware:\e[97m $gateway\e[0m"
-    echo ""
-
-    ## Informação sobre URL
-    echo -e "\e[33m DNS:\e[97m $gateway\e[0m"
-    echo ""
-
-
-
-
-
-
-
-    ## Pergunta se as respostas estão corretas
-    read -p "As respostas estão corretas? (Y/N): " confirmacao
-    if [ "$confirmacao" = "Y" ] || [ "$confirmacao" = "y" ]; then
-
-        ## Digitou Y para confirmar que as informações estão corretas
-
-        ## Limpar o terminal
         clear
+        echo -e "\e[33mNome da placa de rede:\e[97m $interface\e[0m"
+        echo -e "\e[33mIP da máquina:\e[97m $ip_address\e[0m"
+        echo -e "\e[33mGateway:\e[97m $gateway\e[0m"
+        echo -e "\e[33mDNS:\e[97m ${dns_servers[*]}\e[0m"
+        echo ""
 
-        ## Mostrar mensagem de Instalando
-        ###instalando_msg
-
-        ## Sai do Loop
-        break
-    else
-
-        ## Digitou N para dizer que as informações não estão corretas.
-
-        ## Limpar o terminal
-        clear
-
-        ### Mostra o nome da ferramenta
-        ####nome_traefik_e_portainer
-
-        ## Mostra mensagem para preencher informações
-        ###preencha_as_info
-
-    ## Volta para o inicio do loop com as perguntas
-    fi
-
-
-    ############ criar um novo para o nome
-    ## Mostra o nome da aplicação
-    #nome_traefik_e_portainer
-
-
-    # Constrói a configuração do Netplan
-    echo "Gerando arquivo de configuração..."
-    config="network:
-    ethernets:
-        $interface:
-        dhcp4: no
-        addresses:
-            - $ip_address
-        routes:
-            - to: default
-            via: $gateway
-        nameservers:
-            addresses:"
-
-    # Adiciona os servidores DNS ao arquivo
-    for dns in "${dns_servers[@]}"; do
-    config+="\n          - $dns"
+        read -p "As respostas estão corretas? (Y/N): " confirmacao
+        if [[ "$confirmacao" =~ ^[Yy]$ ]]; then
+            break
+        else
+            clear
+        fi
     done
 
-    config+="\n  version: 2"
-
+    echo "Gerando arquivo de configuração..."
+    config=$(cat <<EOF
+network:
+  version: 2
+  ethernets:
+    $interface:
+      dhcp4: no
+      addresses:
+        - $ip_address
+      routes:
+        - to: default
+          via: $gateway
+      nameservers:
+        addresses:
+$(for dns in "${dns_servers[@]}"; do echo "          - $dns"; done)
+EOF
+)
 
     [ -d /etc/netplan_bkp ] || (sudo mkdir -p /etc/netplan_bkp && sudo cp -r /etc/netplan/* /etc/netplan_bkp/)
-
-   #sudo mkdir -p /etc/netplan_bkp && sudo cp -r /etc/netplan/* /etc/netplan_bkp/
-
     sudo rm -rf /etc/netplan/*
+    echo "$config" | sudo tee /etc/netplan/00-installer-config.yaml > /dev/null
 
-    # Salva o arquivo de configuração
-    sudo bash -c "echo \"$config\" > /etc/netplan/00-installer-config.yaml"
-
-    # Aplica as configurações do Netplan
     echo "Aplicando configurações..."
     sudo netplan apply
-    echo "Configuração aplicada com sucesso!
-    
-    IP configurado: $ip_address
-    GatWare: $gateway
-    
-    "
 
-    menu_principal
-
-
-
-}
-
-
-serve_local_ip_fixo(){
+    echo -e "\nConfiguração aplicada com sucesso!"
+    echo "IP configurado: $ip_address"
+    echo "Gateway: $gateway"
     echo ""
+    read -p "Pressione Enter para voltar ao menu..."
 }
 
-serve_local_ip_fixo_retorno(){
-    echo ""
+tunnel_cloudflared() {
+    echo "Função de Tunnel CloudFlared ainda não implementada."
+    read -p "Pressione Enter para voltar ao menu..."
 }
+
+serve_local_ip_fixo_retorno() {
+    echo "Função de configuração inicial do IP ainda não implementada."
+    read -p "Pressione Enter para voltar ao menu..."
+}
+
+# Iniciar o script
+menu_principal
