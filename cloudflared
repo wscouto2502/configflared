@@ -129,10 +129,8 @@ serve_local_ip_fixo_retorno() {
 
 todos_ips(){
     clear
-    echo -e "\nLista de ip(s) da maquina:"
-    echo ""
-    ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
-    read -p "Precione qualquer tecla para voltar ao menu principal..."
+    echo "Dados das Interfaces disponiveis antes da modificação"
+    dados_interface
 }
 
 
