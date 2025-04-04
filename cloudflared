@@ -83,16 +83,9 @@ $(for dns in "${dns_servers[@]}"; do echo "          - $dns"; done)
 EOF
 )
 
-    if [ ! -d /etc/netplan_bkp ]; then
-    sudo mkdir -p /etc/netplan_bkp
-    sudo cp -r /etc/netplan/* /etc/netplan_bkp/
-    fi
-    
-    
-    sudo rm -rf /etc/netplan/*
-    echo "$config" | sudo tee /etc/netplan/00-installer-config.yaml > /dev/null
+    echo "$config" | sudo tee /etc/netplan/01-installer-config.yaml > /dev/null
 
-    sudo chmod -R 755 /etc/netplan/00-installer-config.yaml
+    sudo chmod -R 755 /etc/netplan/01-installer-config.yaml
 
     echo ""
     echo ""
@@ -111,11 +104,7 @@ tunnel_cloudflared() {
 }
 
 serve_local_ip_fixo_retorno() {
-    if [ ! -d /etc/netplan_bkp ]; then
-        sudo cp -r /etc/netplan_bkp/* /etc/netplan/
-        sudo chmod -R 755 /etc/netplan
-        sudo rm -rf /etc/netplan_bkp
-        echo "backup restaurado"
+        sudo rm -rf /etc/netplan/01-installer-config.yaml
 
         # Caminho para o arquivo Netplan
         arquivo_netplan="/etc/netplan/00-installer-config.yaml"
@@ -123,14 +112,10 @@ serve_local_ip_fixo_retorno() {
         # Extrai o endereço IP (linha que começa com "- " e contém "/")
         ip=$(grep -oP '^\s*-\s*\K[\d\.]+/\d+' "$arquivo_netplan")
 
-
+        echo "backup restaurado"
         echo -e "\nseu IP: $ip"
         echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
         sudo netplan apply
-
-    else
-        echo "O diretório /etc/netplan_bkp já existe. Nenhum backup foi criado."
-    fi
 
     read -p "Pressione Enter para voltar ao menu..."
     menu_principal
