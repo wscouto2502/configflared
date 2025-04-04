@@ -10,7 +10,9 @@ menu_principal() {
         [01]: Configurar IP Fixo
         [02]: voltar a configuração inicial do IP
         [03]: Configurar Tunnel CloudFlared   
-        [xx]: Sair do instalador"
+        [xx]: Sair do instalador
+        
+        "
 
         read -p "Digite sua opção: " opcao1
 
@@ -93,10 +95,6 @@ EOF
     chmod -R 755 /etc/netplan
 
     clear
-    echo ""
-    echo ""
-    echo ""
-    echo ""
     echo -e "\nAplicando configurações..."
     echo ""
     echo -e "\nLista de ip(s) da maquina antes da atualização:"
@@ -104,6 +102,7 @@ EOF
     ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
     echo ""
     echo "seu ip que selecionou: $ip_address"
+    echo ""
     echo -p "Aguarde aplicando paremetros..."
     sudo netplan apply > /dev/null 2>&1
     read -p "Concluido! Pressione Enter para voltar ao menu..."
@@ -143,10 +142,10 @@ dados_interface(){
 interfaces=$(ip -o link show | awk -F': ' '/^[0-9]+: / && $2 !~ /(lo|veth|docker|br-|virbr|vmnet|tun|wg)/ {print $2}')
 
 for iface in $interfaces; do
-    # Verifica se a interface tem IP com máscara CIDR
-    ip_cidr=$(ip -4 addr show dev "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}/\d+')
+    # Coleta todos os IPs IPv4 com máscara atribuídos à interface
+    ip_cidrs=$(ip -4 addr show dev "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}/\d+')
 
-    if [ -n "$ip_cidr" ]; then
+    if [ -n "$ip_cidrs" ]; then
         # Tenta obter o gateway para essa interface
         gateway=$(ip route show dev "$iface" | awk '/default/ {print $3}')
 
@@ -154,13 +153,19 @@ for iface in $interfaces; do
         dns=$(resolvectl dns "$iface" 2>/dev/null | awk '{$1=""; print $0}' | sed 's/^ *//')
 
         echo "Interface: $iface"
-        echo "  IP:       $ip_cidr"
+        
+        # Lista todos os IPs
+        echo "$ip_cidrs" | while read -r ip; do
+            echo "  IP:       $ip"
+        done
+
         echo "  Gateway:  ${gateway:-N/A}"
         echo "  DNS:      ${dns:-N/A}"
         echo ""
     fi
 done
 }
+
 
 
 # Iniciar o script
