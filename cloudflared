@@ -135,36 +135,36 @@ tunnel_cloudflared() {
 
     
 
-echo -e "\n🔐 Verificando login do Cloudflared..."
+    echo -e "\n🔐 Verificando login do Cloudflared..."
 
-# Caminho padrão do certificado de autenticação
-cert_file="/root/.cloudflared/cert.pem"
+    # Caminho padrão do certificado de autenticação
+    cert_file="/root/.cloudflared/cert.pem"
 
-# Verifica se o certificado existe
-if [ ! -f "$cert_file" ]; then
-    echo "🧩 Nenhum certificado encontrado. Realizando login no Cloudflare..."
-
-    # Salva a saída do login em uma variável e também mostra no terminal
-    login_output=$(cloudflared tunnel login | tee /dev/tty)
-
-    # Captura o link de autenticação, se aparecer
-    link=$(echo "$login_output" | grep -oE 'https://dash.cloudflare.com/argotunnel[^[:space:]]*')
-
-    if [ -n "$link" ]; then
-        echo -e "\n🔗 Link detectado para login: $link"
-    fi
-
-    echo -e "\n⏳ Aguardando autenticação..."
-    read -p "✅ Após completar a autenticação, pressione ENTER para continuar..."
-
-    # Verifica se o cert.pem foi criado
+    # Verifica se o certificado existe
     if [ ! -f "$cert_file" ]; then
-        echo -e "\n❌ Login aparentemente não foi concluído. Tente novamente."
-        exit 1
+        echo "🧩 Nenhum certificado encontrado. Realizando login no Cloudflare..."
+
+        # Salva a saída do login em uma variável e também mostra no terminal
+        login_output=$(cloudflared tunnel login | tee /dev/tty)
+
+        # Captura o link de autenticação, se aparecer
+        link=$(echo "$login_output" | grep -oE 'https://dash.cloudflare.com/argotunnel[^[:space:]]*')
+
+        if [ -n "$link" ]; then
+            echo -e "\n🔗 Link detectado para login: $link"
+        fi
+
+        echo -e "\n⏳ Aguardando autenticação..."
+        read -p "✅ Após completar a autenticação, pressione ENTER para continuar..."
+
+        # Verifica se o cert.pem foi criado
+        if [ ! -f "$cert_file" ]; then
+            echo -e "\n❌ Login aparentemente não foi concluído. Tente novamente."
+            exit 1
+        fi
+    else
+        echo "✅ Já autenticado! Certificado encontrado em: $cert_file"
     fi
-else
-    echo "✅ Já autenticado! Certificado encontrado em: $cert_file"
-fi
 
 
 
