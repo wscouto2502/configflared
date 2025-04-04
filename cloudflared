@@ -45,16 +45,8 @@ menu_principal() {
 serve_local_ip_fixo() {
     clear
     while true; do
-        echo "Lista das placas de rede disponíveis:"
-        ip link show | awk -F': ' '/^[0-9]+: / && !/veth[0-9a-f]+@/ && !/docker0/ && !/docker_gwbridge/ && !/lo/ {print $2}'
-        echo ""
-        echo ""
-        echo ""
-        echo ""
 
         dados_interface
-
-
 
         read -p "Digite o nome da placa de rede (ex: enp0s3): " interface
         read -p "Digite o endereço IP com a máscara (ex: 192.168.0.10/24): " ip_address
@@ -153,7 +145,7 @@ dados_interface(){
 # Lista todas as interfaces ativas (excluindo virtuais e loopback)
 interfaces=$(ip -o link show | awk -F': ' '/^[0-9]+: / && $2 !~ /(lo|veth|docker|br-|virbr|vmnet|tun|wg)/ {print $2}')
 
-echo "Interfaces de Rede com IP, Gateway e DNS:"
+echo "Dados das Interfaces disponiveis:"
 echo "------------------------------------------"
 
 for iface in $interfaces; do
