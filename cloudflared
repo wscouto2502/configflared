@@ -134,24 +134,29 @@ tunnel_cloudflared() {
     fi
 
     
-    echo "\n🔐 Verificando login do Cloudflared..."
+    echo -e "\n🔐 Verificando login do Cloudflared..."
     cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
 
     if [ -z "$cred_file" ]; then
         echo "🧩 Realizando login no Cloudflare..."
+
+        # Captura a saída do login
         login_output=$(cloudflared tunnel login --no-autoupdate 2>&1)
-        link=$(echo "$login_output" | grep -i 'https://dash.cloudflare.com/argotunnel')
+
+        # Procura a linha que contém o link com token
+        link=$(echo "$login_output" | grep -oE 'https://dash.cloudflare.com/argotunnel[^[:space:]]*')
 
         if [ -n "$link" ]; then
             echo -e "\n🔗 Abra o link abaixo no navegador e autentique-se:\n$link"
             read -p "Após completar a autenticação, pressione ENTER para continuar..."
             cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
         else
-            echo -e "\n❌ Falha ao obter o link de autenticação. Saída completa:"
+            echo -e "\n❌ Falha ao capturar o link de autenticação. Saída completa:"
             echo "$login_output"
             exit 1
         fi
     fi
+
 
 
 
