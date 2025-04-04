@@ -131,6 +131,7 @@ todos_ips(){
     clear
     echo "Dados das Interfaces disponiveis antes da modificação"
     dados_interface
+    echo ""  # quebra de linha
     read -p "Concluido! Pressione Enter para voltar ao menu..."
 }
 
