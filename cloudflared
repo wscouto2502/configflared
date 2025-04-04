@@ -48,6 +48,13 @@ serve_local_ip_fixo() {
         echo "Lista das placas de rede disponíveis:"
         ip link show | awk -F': ' '/^[0-9]+: / && !/veth[0-9a-f]+@/ && !/docker0/ && !/docker_gwbridge/ && !/lo/ {print $2}'
         echo ""
+        echo ""
+        echo ""
+        echo ""
+
+        dados_interface
+
+
 
         read -p "Digite o nome da placa de rede (ex: enp0s3): " interface
         read -p "Digite o endereço IP com a máscara (ex: 192.168.0.10/24): " ip_address
@@ -137,6 +144,37 @@ todos_ips(){
     echo ""
     ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
     read -p "Precione qualquer tecla para voltar ao menu principal..."
+}
+
+
+dados_interface(){
+#!/bin/bash
+
+# Lista todas as interfaces ativas (excluindo virtuais e loopback)
+interfaces=$(ip -o link show | awk -F': ' '/^[0-9]+: / && $2 !~ /(lo|veth|docker|br-|virbr|vmnet|tun|wg)/ {print $2}')
+
+echo "Interfaces de Rede com IP, Gateway e DNS:"
+echo "------------------------------------------"
+
+for iface in $interfaces; do
+    # Verifica se a interface tem IP
+    ip_addr=$(ip -4 addr show dev "$iface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+    if [ -n "$ip_addr" ]; then
+        # Tenta obter o gateway para essa interface
+        gateway=$(ip route show dev "$iface" | awk '/default/ {print $3}')
+
+        # Obtém os servidores DNS (se systemd-resolved estiver ativo)
+        dns=$(resolvectl dns "$iface" 2>/dev/null | awk '{$1=""; print $0}' | sed 's/^ *//')
+
+        echo "Interface: $iface"
+        echo "  IP:       $ip_addr"
+        echo "  Gateway:  ${gateway:-N/A}"
+        echo "  DNS:      ${dns:-N/A}"
+        echo ""
+    fi
+done
+
 }
 
 # Iniciar o script
