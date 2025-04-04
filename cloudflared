@@ -105,15 +105,12 @@ tunnel_cloudflared() {
 
 serve_local_ip_fixo_retorno() {
         sudo rm -rf /etc/netplan/01-installer-config.yaml
+        
+        echo -e "\nLista de ip(s) da maquina:"
+        echo ""
+        ip -o addr show | awk '!/ lo / && /inet/ {print $2 ": " $4}'
 
-        # Caminho para o arquivo Netplan
-        arquivo_netplan="/etc/netplan/00-installer-config.yaml"
 
-        # Extrai o endereço IP (linha que começa com "- " e contém "/")
-        ip=$(grep -oP '^\s*-\s*\K[\d\.]+/\d+' "$arquivo_netplan")
-
-        echo "backup restaurado"
-        echo -e "\nseu IP: $ip"
         echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
         sudo netplan apply
 
