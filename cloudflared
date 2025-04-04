@@ -94,13 +94,13 @@ EOF
     echo ""
     echo -e "\nAplicando configurações..."
     echo ""
-    echo -e "\nLista de ip(s) da maquina:"
+    echo -e "\nLista de ip(s) da maquina antes da atualização:"
     echo ""
     ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
     echo ""
+    echo "seu ip que selecionou: $ip_address"
     read -p "Aguarde aplicando paremetros..."
     sudo netplan apply > /dev/null 2>&1
-    sleep 15
     read -p "Concluido! Pressione Enter para voltar ao menu..."
 
 }
@@ -124,7 +124,6 @@ serve_local_ip_fixo_retorno() {
         chmod -R 755 /etc/netplan
         read -p "Aguarde aplicando paremetros..."
         sudo netplan apply > /dev/null 2>&1
-        sleep 15
         read -p "Concluido! Pressione Enter para voltar ao menu..."
         menu_principal
 }
