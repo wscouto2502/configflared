@@ -119,8 +119,6 @@ EOF
 
 
 
-#!/bin/bash
-
 tunnel_cloudflared() {
     clear
     echo "\n🔄 Verificando instalação do Cloudflared..."
@@ -140,16 +138,20 @@ tunnel_cloudflared() {
 
     if [ -z "$cred_file" ]; then
         echo "🧩 Realizando login no Cloudflare..."
-        link=$(cloudflared tunnel login 2>&1 | grep -Eo 'https://[^ ]+')
+        login_output=$(cloudflared tunnel login --no-autoupdate 2>&1)
+        link=$(echo "$login_output" | grep -Eo 'https://[^ ]+')
+
         if [ -n "$link" ]; then
-            echo "\nAbra o link abaixo no navegador e autentique-se:\n$link"
+            echo -e "\n🔗 Abra o link abaixo no navegador e autentique-se:\n$link"
             read -p "Após completar a autenticação, pressione ENTER para continuar..."
             cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
         else
-            echo "❌ Falha ao obter link de autenticação."
+            echo -e "\n❌ Falha ao obter o link de autenticação. Saída completa:"
+            echo "$login_output"
             exit 1
         fi
     fi
+
 
     config_tunel_file="/etc/cloudflared/conftunel"
 
