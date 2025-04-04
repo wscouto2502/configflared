@@ -134,7 +134,7 @@ tunnel_cloudflared() {
     fi
 
     
-    
+
 echo -e "\n🔐 Verificando login do Cloudflared..."
 cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
 
@@ -142,7 +142,8 @@ if [ -z "$cred_file" ]; then
     echo "🧩 Realizando login no Cloudflare..."
     
    
-    cloudflared tunnel login
+    
+    cloudflared tunnel login 
 
     echo -e "\n⏳ Aguardando autenticação..."
     read -p "✅ Após completar a autenticação, pressione ENTER para continuar..."
