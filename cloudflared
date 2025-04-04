@@ -1,0 +1,199 @@
+
+##ferramenta_traefik_e_portainer
+
+##nome_traefik_e_portainer
+
+##conferindo_as_info
+
+
+menu_principal(){
+
+while true; do
+
+    clear
+
+    echo "O que deseja fazer?
+
+    [00]: Configurar IP Fixo
+    [01]: Configurar Tunnel CloudFlared
+    [02]: Configuração inicial do IP
+    [xx]: Sair do instalador"
+
+
+    read interface
+
+    case $opcao1 in
+
+        0|00)
+            serve_local_ip_fixo
+            ;;
+
+        1|01)
+            tunnel_cloudflared
+            ;;
+        2|02)
+            serve_local_ip_fixo_retorno
+            ;;
+
+        sair|fechar|exit|close|x|xx|XX|x)
+            clear
+            echo "Obrigado por utilizar!"
+            break
+            ;;
+   *)
+
+            ;;
+    esac
+    echo ""
+}
+
+
+
+serve_local_ip_fixo() {
+
+clear
+
+############ criar um novo para o nome
+## Mostra o nome da aplicação
+#nome_traefik_e_portainer
+
+## Mostra mensagem para preencher informações
+#preencha_as_info
+
+## Inicia um Loop até os dados estarem certos
+while true; do
+
+    echo "Lista das placa de rede disponivel:
+    
+    "
+    ip link show | awk -F': ' '/^[0-9]+: / && !/veth[0-9a-f]+@/ && !/docker0/ && !/docker_gwbridge/ && !/lo/ {print $2}'
+
+    # Solicita ao usuário as informações necessárias
+    echo "Digite o nome da placa de rede (ex: enp0s3):"
+    read interface
+
+    echo "Digite o endereço IP com a máscara (ex: 192.168.0.10/24):"
+    read ip_address
+
+    echo "Digite o gateway, IP do roteador (ex: 192.168.0.1):"
+    read gateway
+
+    echo "Digite o(s) servidor(es) DNS separados por espaço (ex: 1.1.1.1 8.8.8.8):"
+    read -a dns_servers
+
+
+    clear
+
+    ## Informação sobre URL
+    echo -e "\e[33m nome da placa de rede:\e[97m $interface\e[0m"
+    echo ""
+
+    ## Informação sobre URL
+    echo -e "\e[33m IP da máquina:\e[97m $ip_address\e[0m"
+    echo ""
+
+    ## Informação sobre URL
+    echo -e "\e[33m Gateware:\e[97m $gateway\e[0m"
+    echo ""
+
+    ## Informação sobre URL
+    echo -e "\e[33m DNS:\e[97m $gateway\e[0m"
+    echo ""
+
+
+
+
+
+
+
+    ## Pergunta se as respostas estão corretas
+    read -p "As respostas estão corretas? (Y/N): " confirmacao
+    if [ "$confirmacao" = "Y" ] || [ "$confirmacao" = "y" ]; then
+
+        ## Digitou Y para confirmar que as informações estão corretas
+
+        ## Limpar o terminal
+        clear
+
+        ## Mostrar mensagem de Instalando
+        ###instalando_msg
+
+        ## Sai do Loop
+        break
+    else
+
+        ## Digitou N para dizer que as informações não estão corretas.
+
+        ## Limpar o terminal
+        clear
+
+        ### Mostra o nome da ferramenta
+        ####nome_traefik_e_portainer
+
+        ## Mostra mensagem para preencher informações
+        ###preencha_as_info
+
+    ## Volta para o inicio do loop com as perguntas
+    fi
+
+
+    ############ criar um novo para o nome
+    ## Mostra o nome da aplicação
+    #nome_traefik_e_portainer
+
+
+    # Constrói a configuração do Netplan
+    echo "Gerando arquivo de configuração..."
+    config="network:
+    ethernets:
+        $interface:
+        dhcp4: no
+        addresses:
+            - $ip_address
+        routes:
+            - to: default
+            via: $gateway
+        nameservers:
+            addresses:"
+
+    # Adiciona os servidores DNS ao arquivo
+    for dns in "${dns_servers[@]}"; do
+    config+="\n          - $dns"
+    done
+
+    config+="\n  version: 2"
+
+
+    [ -d /etc/netplan_bkp ] || (sudo mkdir -p /etc/netplan_bkp && sudo cp -r /etc/netplan/* /etc/netplan_bkp/)
+
+   #sudo mkdir -p /etc/netplan_bkp && sudo cp -r /etc/netplan/* /etc/netplan_bkp/
+
+    sudo rm -rf /etc/netplan/*
+
+    # Salva o arquivo de configuração
+    sudo bash -c "echo \"$config\" > /etc/netplan/00-installer-config.yaml"
+
+    # Aplica as configurações do Netplan
+    echo "Aplicando configurações..."
+    sudo netplan apply
+    echo "Configuração aplicada com sucesso!
+    
+    IP configurado: $ip_address
+    GatWare: $gateway
+    
+    "
+
+    menu_principal
+
+
+
+}
+
+
+serve_local_ip_fixo(){
+    echo ""
+}
+
+serve_local_ip_fixo_retorno(){
+    echo ""
+}
