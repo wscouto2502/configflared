@@ -139,7 +139,7 @@ tunnel_cloudflared() {
     if [ -z "$cred_file" ]; then
         echo "🧩 Realizando login no Cloudflare..."
         login_output=$(cloudflared tunnel login --no-autoupdate 2>&1)
-        link=$(echo "$login_output" | grep -iEo 'https://dash.cloudflare.com[^ ]+')
+        link=$(echo "$login_output" | grep -iEo 'https://dash.cloudflare.com/argotunnel[^ ]*')
 
         if [ -n "$link" ]; then
             echo -e "\n🔗 Abra o link abaixo no navegador e autentique-se:\n$link"
@@ -151,6 +151,7 @@ tunnel_cloudflared() {
             exit 1
         fi
     fi
+
 
 
 
