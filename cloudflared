@@ -85,7 +85,7 @@ EOF
 
     echo "$config" | sudo tee /etc/netplan/01-installer-config.yaml > /dev/null
 
-    sudo chmod 644 /etc/netplan/01-installer-config.yaml
+    chmod -R 755 /etc/netplan
 
     echo ""
     echo ""
@@ -113,6 +113,8 @@ serve_local_ip_fixo_retorno() {
 
 
         echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
+        
+        chmod -R 755 /etc/netplan
         sudo netplan apply
 
     read -p "Pressione Enter para voltar ao menu..."
