@@ -140,9 +140,7 @@ cred_file=$(find /root/.cloudflared -name '*.json' | head -n 1)
 
 if [ -z "$cred_file" ]; then
     echo "🧩 Realizando login no Cloudflare..."
-    
-   
-    
+       
     cloudflared tunnel login 
 
     echo -e "\n⏳ Aguardando autenticação..."
