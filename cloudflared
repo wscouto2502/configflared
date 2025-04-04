@@ -108,7 +108,9 @@ serve_local_ip_fixo_retorno() {
         
         echo -e "\nLista de ip(s) da maquina:"
         echo ""
-        ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4,a,"/"); print a[1]}'
+
+        ip -o -4 addr show | awk '!/ lo / && !/docker/ && !/veth/ {split($4, a, "/"); print a[1]}'
+
 
         echo -e "\nCaso esteja utilizando acesso remoto reconecte com o servidor com o novo IP!"
         sudo netplan apply
